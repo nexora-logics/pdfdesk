@@ -1,0 +1,292 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>PDF Desk – edit PDFs offline on Windows</title>
+<meta name="description" content="Free offline PDF editor for Windows. Edit text, sign, stamp, redact, fill and build forms, and read scanned pages. No installation, no upload.">
+<meta property="og:title" content="PDF Desk – edit PDFs offline on Windows">
+<meta property="og:description" content="Free offline PDF editor. Edit, sign, stamp, redact and fill forms. No installation. Files never leave your computer.">
+<meta property="og:image" content="assets/editor.jpg">
+<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'><rect x='5' y='2' width='22' height='28' rx='3' fill='%23243330'/><rect x='10' y='19' width='12' height='6' rx='1' fill='none' stroke='%23C8372D' stroke-width='2'/></svg>">
+<link rel="preload" href="assets/fonts/barlow-condensed-latin-700-normal.woff2" as="font" type="font/woff2" crossorigin>
+<style>
+@font-face{font-family:"Barlow Condensed";font-weight:600;font-display:swap;src:url(assets/fonts/barlow-condensed-latin-600-normal.woff2) format("woff2")}
+@font-face{font-family:"Barlow Condensed";font-weight:700;font-display:swap;src:url(assets/fonts/barlow-condensed-latin-700-normal.woff2) format("woff2")}
+@font-face{font-family:Barlow;font-weight:400;font-display:swap;src:url(assets/fonts/barlow-latin-400-normal.woff2) format("woff2")}
+@font-face{font-family:Barlow;font-weight:500 700;font-display:swap;src:url(assets/fonts/barlow-latin-600-normal.woff2) format("woff2")}
+/*
+  To publish: replace YOUR-USERNAME below (and in the links) with your GitHub user name,
+  push this "docs" folder, then Settings > Pages > Branch: main, folder: /docs.
+*/
+:root{
+  --desk:#DCE0D8; --desk-deep:#CDD3C8; --paper:#FFFFFF; --panel:#F6F6F1;
+  --ink:#243330; --muted:#56635E; --line:#BFC7BB;
+  --stamp:#C8372D; --stamp-soft:#F4DEDA; --sig:#1F4E9A; --hl:#FFE14D;
+  --head:"Barlow Condensed",Bahnschrift,"Arial Narrow",sans-serif;
+  --body:Barlow,Bahnschrift,"Segoe UI",system-ui,sans-serif;
+  --shadow:0 1px 2px rgba(36,51,48,.16),0 18px 40px -12px rgba(36,51,48,.28);
+  color-scheme:light;
+}
+@media (prefers-color-scheme:dark){
+  :root{ --desk:#1C2321; --desk-deep:#161C1A; --paper:#262E2C; --panel:#222A28; --ink:#E6ECE8; --muted:#A3B0AB; --line:#3B4744;
+    --stamp:#E26357; --stamp-soft:#3B2724; --sig:#7FA6E6; --shadow:0 1px 2px rgba(0,0,0,.5),0 18px 40px -12px rgba(0,0,0,.6); color-scheme:dark; }
+}
+*{box-sizing:border-box}
+html{scroll-padding-top:env(safe-area-inset-top,0px);-webkit-text-size-adjust:100%}
+:root{padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}
+body{margin:0;background:var(--desk);color:var(--ink);font:400 18px/1.6 var(--body);-webkit-font-smoothing:antialiased}
+img{max-width:100%;display:block;height:auto}
+a{color:var(--sig)}
+a:focus-visible,button:focus-visible,summary:focus-visible{outline:3px solid var(--stamp);outline-offset:3px;border-radius:4px}
+.wrap{width:min(1160px,100% - 40px);margin-inline:auto}
+h1,h2,h3{font-family:var(--head);font-weight:600;line-height:1.05;margin:0;letter-spacing:-.005em}
+h2{font-size:clamp(34px,4.6vw,52px)}
+h3{font-size:26px;font-weight:600}
+p{margin:0 0 1em;max-width:62ch}
+
+/* top bar */
+.top{display:flex;align-items:center;justify-content:space-between;padding:18px 0}
+.brand{display:flex;align-items:center;gap:10px;font:600 24px/1 var(--head);color:var(--ink);text-decoration:none}
+.brand svg{width:22px;height:27px}
+.top nav{display:flex;gap:22px;font-size:16px}
+.top nav a{color:var(--ink);text-decoration:none}
+.top nav a:hover{text-decoration:underline;text-underline-offset:4px}
+
+/* buttons */
+.btn{display:inline-flex;align-items:center;gap:10px;font:600 18px/1 var(--body);padding:15px 22px;border-radius:8px;text-decoration:none;border:2px solid var(--ink);color:var(--ink);background:transparent}
+.btn.solid{background:var(--ink);color:var(--panel)}
+.btn.solid:hover{background:color-mix(in srgb,var(--ink) 88%,var(--stamp))}
+.btn:hover{border-color:var(--stamp)}
+.btn svg{width:20px;height:20px;stroke:currentColor;fill:none;stroke-width:2.2;stroke-linecap:round;stroke-linejoin:round}
+
+/* hero */
+.hero{display:grid;grid-template-columns:minmax(0,5fr) minmax(0,7fr);gap:56px;align-items:center;padding:40px 0 90px}
+.hero h1{font-size:clamp(50px,7.4vw,96px);font-weight:700;line-height:.92;letter-spacing:-.015em}
+.hero .lede{font-size:21px;color:var(--muted);margin:26px 0 30px;max-width:30ch}
+.hero .cta{display:flex;flex-wrap:wrap;gap:12px;margin-bottom:18px}
+.hero .fine{font-size:15px;color:var(--muted);margin:0}
+.sheet{position:relative;transform:rotate(-1.4deg);transform-origin:60% 40%}
+.sheet img{border-radius:6px;box-shadow:var(--shadow);border:1px solid var(--line)}
+.stamp{position:absolute;right:-18px;top:-34px;transform:rotate(-9deg);color:var(--stamp);border:5px solid currentColor;border-radius:12px;padding:12px 22px 10px;text-align:center;
+  font:700 34px/1 var(--head);letter-spacing:.04em;background:color-mix(in srgb,var(--paper) 78%,transparent);
+  box-shadow:inset 0 0 0 3px var(--paper),inset 0 0 0 5px currentColor;mix-blend-mode:normal}
+.stamp small{display:block;font:600 16px/1.2 var(--head);letter-spacing:.06em;margin-top:6px}
+@media (prefers-reduced-motion:no-preference){
+  .stamp{animation:press .55s cubic-bezier(.2,.9,.3,1.2) .7s both}
+  @keyframes press{0%{opacity:0;transform:rotate(-9deg) scale(1.9)}60%{opacity:1;transform:rotate(-9deg) scale(.94)}100%{opacity:1;transform:rotate(-9deg) scale(1)}}
+}
+
+/* facts strip */
+.facts{background:var(--ink);color:var(--panel)}
+.facts .wrap{display:grid;grid-template-columns:repeat(3,1fr);gap:40px;padding:56px 0}
+.facts h3{font-size:28px;margin-bottom:8px}
+.facts p{color:color-mix(in srgb,var(--panel) 78%,var(--ink));font-size:17px;margin:0}
+
+/* features as a reviewed checklist */
+.features{padding:100px 0 40px}
+.features > .wrap > h2{margin-bottom:14px}
+.features > .wrap > p{color:var(--muted);font-size:20px;margin-bottom:56px}
+.group{display:grid;grid-template-columns:minmax(0,5fr) minmax(0,6fr);gap:56px;align-items:start;padding:56px 0;border-top:1px solid var(--line)}
+.group.flip .shot{order:-1}
+.group h3{margin-bottom:18px}
+.checks{list-style:none;margin:0;padding:0}
+.checks li{position:relative;padding:0 0 16px 44px}
+.checks li::before{content:"";position:absolute;left:0;top:3px;width:26px;height:22px;
+  background:no-repeat center/contain url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 26 22'%3E%3Cpath d='M2 12l7 7L24 3' fill='none' stroke='%23C8372D' stroke-width='3' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E")}
+.checks b{font-weight:600}
+.checks span{display:block;color:var(--muted);font-size:17px;line-height:1.5}
+.checks .pro{display:inline-block;color:var(--stamp);font-size:13px;line-height:1}
+.pro{display:inline-block;font:600 13px/1 var(--body);color:var(--stamp);background:var(--stamp-soft);padding:4px 7px 3px;border-radius:4px;margin-left:8px;vertical-align:2px}
+.shot img{border-radius:6px;box-shadow:var(--shadow);border:1px solid var(--line)}
+.shot figcaption{font-size:15px;color:var(--muted);margin-top:12px}
+.mini{display:grid;grid-template-columns:1fr 1fr;gap:0 40px}
+mark{background:linear-gradient(transparent 52%,var(--hl) 52%);color:inherit;padding:0 2px}
+@media (prefers-color-scheme:dark){ mark{background:linear-gradient(transparent 55%,rgba(255,225,77,.35) 55%)} }
+
+/* free band */
+.free{padding:96px 0 104px}
+.free h2{font-size:clamp(40px,6vw,72px);font-weight:700;margin-bottom:18px}
+.free p{font-size:21px;color:var(--muted);max-width:52ch}
+
+/* steps */
+.start{background:var(--panel);border-block:1px solid var(--line);padding:90px 0}
+.start h2{margin-bottom:40px}
+.steps{list-style:none;margin:0;padding:0;display:grid;grid-template-columns:repeat(3,1fr);gap:36px;counter-reset:s}
+.steps li{counter-increment:s}
+.steps li::before{content:counter(s);display:grid;place-items:center;width:46px;height:46px;border-radius:50%;border:2px solid var(--stamp);color:var(--stamp);font:700 24px/1 var(--head);margin-bottom:16px}
+.steps h3{font-size:24px;margin-bottom:8px}
+.steps p{color:var(--muted);font-size:17px}
+code{font-family:Consolas,"Courier New",monospace;font-size:.92em;background:var(--desk);padding:1px 6px;border-radius:4px}
+
+/* faq */
+.faq{padding:100px 0}
+.faq h2{margin-bottom:30px}
+.faq details{border-top:1px solid var(--line);max-width:860px}
+.faq details:last-of-type{border-bottom:1px solid var(--line)}
+.faq summary{cursor:pointer;list-style:none;padding:20px 40px 20px 0;font:600 21px/1.3 var(--body);position:relative}
+.faq summary::-webkit-details-marker{display:none}
+.faq summary::after{content:"";position:absolute;right:6px;top:50%;width:12px;height:12px;border-right:2.5px solid var(--ink);border-bottom:2.5px solid var(--ink);transform:translateY(-70%) rotate(45deg);transition:transform .2s}
+.faq details[open] summary::after{transform:translateY(-30%) rotate(-135deg)}
+.faq details p{color:var(--muted);font-size:17px;margin:-4px 0 22px}
+
+/* footer */
+footer{background:var(--desk-deep);padding:56px 0 calc(40px + env(safe-area-inset-bottom,0px));font-size:15px;color:var(--muted)}
+footer .wrap{display:grid;grid-template-columns:1.2fr 1fr;gap:40px}
+footer h3{font-size:22px;color:var(--ink);margin-bottom:10px}
+footer p{max-width:none}
+footer a{color:inherit}
+
+@media (max-width:900px){
+  body{font-size:17px}
+  .hero{grid-template-columns:1fr;gap:44px;padding:20px 0 80px}
+  .hero .lede{max-width:none}
+  .stamp{font-size:24px;right:4px;top:-30px}
+  .facts .wrap,.steps{grid-template-columns:1fr;gap:28px}
+  .group{grid-template-columns:1fr;gap:28px}
+  .group.flip .shot{order:0}
+  .mini,footer .wrap{grid-template-columns:1fr}
+  .top nav{display:none}
+}
+@media (prefers-reduced-motion:reduce){*{transition:none!important;animation:none!important}}
+</style>
+</head>
+<body>
+
+<header class="wrap top">
+  <a class="brand" href="#"><svg viewBox="0 0 32 32" aria-hidden="true"><rect x="5" y="2" width="22" height="28" rx="3" fill="currentColor"/><rect x="10" y="19" width="12" height="6" rx="1" fill="none" stroke="#C8372D" stroke-width="2"/></svg>PDF Desk</a>
+  <nav aria-label="Page sections"><a href="#features">Features</a><a href="#free">Free for all</a><a href="#start">Get started</a><a href="#faq">Questions</a><a href="https://github.com/nexora-logics/pdfdesk">GitHub</a></nav>
+</header>
+
+<main>
+<section class="wrap hero">
+  <div>
+    <h1>Edit PDFs without sending them anywhere.</h1>
+    <p class="lede">Change text, sign, stamp, tick, redact and fill forms, even on scanned pages. Free for everyone, nothing to install, and your files stay on your Windows computer.</p>
+    <div class="cta">
+      <a class="btn solid" href="https://github.com/YOUR-USERNAME/pdf-desk/releases/latest"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 4v11M7 10l5 5 5-5M5 20h14"/></svg>Download PDF Desk</a>
+      <a class="btn" href="#features">See what it does</a>
+    </div>
+    <p class="fine">Free for everyone, no sign-up. Windows 10 or 11 with Chrome or Edge. About 10 MB.</p>
+  </div>
+  <figure class="sheet" style="margin:0">
+    <img src="assets/editor.jpg" width="1440" height="900" alt="PDF Desk showing a report with red ticks and a cross beside distributor rows, a circled figure, a struck-off date with a corrected date above it, a drawn signature and a red Verified stamp.">
+    <div class="stamp" aria-hidden="true">NEVER UPLOADED<small>STAYS ON YOUR PC</small></div>
+  </figure>
+</section>
+
+<section class="facts" aria-label="Why PDF Desk">
+  <div class="wrap">
+    <div><h3>Nothing to install</h3><p>Unzip the folder and double-click <b>PDF Desk.html</b>. No admin rights needed. Runs from the desktop or a pen drive.</p></div>
+    <div><h3>Works offline</h3><p>Editing and text recognition run inside your browser. No internet needed once it is on your computer.</p></div>
+    <div><h3>Private by design</h3><p>Your PDFs are never uploaded. PDF Desk makes no online requests at all: no account, no tracking, no ads.</p></div>
+  </div>
+</section>
+
+<section class="features" id="features">
+  <div class="wrap">
+    <h2>Everything you do to a PDF at your desk</h2>
+    <p>Built for office paperwork: reports, letters, circulars, application forms and scanned certificates.</p>
+
+    <div class="group">
+      <div>
+        <h3>Correct and review</h3>
+        <ul class="checks">
+          <li><b>Edit existing text</b><span>Click any line and retype it. PDF Desk matches the size, colour and style of the original and covers the old words.</span></li>
+          <li><b>Add text</b><span>Click anywhere and type. Choose size, font, bold and colour.</span></li>
+          <li><b>Marks</b><span>Tick, cross, strike off, underline, circle, box, arrow, dot and freehand pen, in red, blue, green or black. Strike-offs snap straight.</span></li>
+          <li><b>Highlight and white-out</b><span>Highlight what matters, or cover a mistake with white.</span></li>
+          <li><b>Redact</b><span>Black out consumer numbers, Aadhaar or phone numbers. On saving, those areas are <mark>permanently erased</mark>, not just covered.</span></li>
+        </ul>
+      </div>
+      <figure class="shot" style="margin:0"><img src="assets/marks.jpg" width="1100" height="680" loading="lazy" alt="A report marked up in PDF Desk with ticks, a cross, a circle, a strike-off and a stamp."><figcaption>A report reviewed in a couple of minutes: ticks, a cross, a circled figure, a corrected date, signature and stamp.</figcaption></figure>
+    </div>
+
+    <div class="group flip">
+      <div>
+        <h3>Sign, stamp and fill</h3>
+        <ul class="checks">
+          <li><b>Signature</b><span>Draw it with the mouse, or upload a photo of your signature on paper. The white background is removed automatically, and your signature is remembered for next time.</span></li>
+          <li><b>Stamps</b><span>Approved, Verified, Received, Checked, Rejected or your own words, with your name or designation and today’s date.</span></li>
+          <li><b>Fill PDF forms</b><span>Type into fillable PDFs, tick their checkboxes and choose from their dropdowns. Answers are locked in when you save.</span></li>
+          <li><b>Build your own forms</b><span>Add text boxes, paragraph boxes, checkboxes, dropdowns and date fields to any PDF. The saved file can be filled in Chrome, Edge or Adobe Reader.</span></li>
+          <li><b>Images and logos</b><span>Place a photo or logo anywhere and resize it.</span></li>
+        </ul>
+      </div>
+      <figure class="shot" style="margin:0"><img src="assets/fill.jpg" width="1440" height="900" loading="lazy" alt="A fillable PDF form in PDF Desk with a typed distributor name, a ticked checkbox and a dropdown set to Good."><figcaption>Filling a fillable inspection form directly on the page.</figcaption></figure>
+    </div>
+
+    <div class="group">
+      <div>
+        <h3>Scans and file size</h3>
+        <ul class="checks">
+          <li><b>Make scans searchable</b><span>Reads the words on scanned pages and phone photos of documents, so you can search and copy them. English text, about 5 to 15 seconds a page.</span></li>
+          <li><b>Edit words on scans</b><span>After reading a scan, click any line to correct it, just like a typed PDF.</span></li>
+          <li><b>Compress</b><span>Shrinks scans and photos for portal upload limits, keeping text sharp. Shows the size before and after.</span></li>
+        </ul>
+      </div>
+      <figure class="shot" style="margin:0"><img src="assets/scan.jpg" width="1440" height="900" loading="lazy" alt="A scanned Field Verification Certificate in PDF Desk after text recognition, with the godown address line being corrected."><figcaption>A scanned certificate after “Make searchable”, with the address line corrected.</figcaption></figure>
+    </div>
+
+    <div class="group">
+      <h3>Pages and files</h3>
+      <ul class="checks mini">
+        <li><b>Merge</b><span>Join several PDFs and photos into one file, in the order you add them.</span></li>
+        <li><b>Extract pages</b><span>Save chosen pages, like 1-3 and 7, as a new PDF.</span></li>
+        <li><b>Reorder, rotate, delete</b><span>Drag page thumbnails into place. Rotate or remove pages in one click.</span></li>
+        <li><b>Blank pages</b><span>Insert a blank page of the same size to write notes or add a cover.</span></li>
+        <li><b>Photos to PDF</b><span>Drop phone photos of documents in and they become A4 pages, turned the right way up.</span></li>
+        <li><b>Undo everything</b><span>Ctrl+Z steps back through any change, including deleted pages.</span></li>
+      </ul>
+    </div>
+  </div>
+</section>
+
+<section class="free" id="free">
+  <div class="wrap">
+    <h2>Free for everyone. Every feature.</h2>
+    <p>No trial, no paid version, no account and no ads. Use it at work and at home, on as many computers as you like, and share the zip with colleagues.</p>
+  </div>
+</section>
+
+<section class="start" id="start">
+  <div class="wrap">
+    <h2>Start in under a minute</h2>
+    <ol class="steps">
+      <li><h3>Download and unzip</h3><p>Get the latest zip from the <a href="https://github.com/YOUR-USERNAME/pdf-desk/releases/latest">Releases page</a> and unzip it anywhere: Desktop, Documents or a pen drive.</p></li>
+      <li><h3>Double-click PDF Desk.html</h3><p>It opens in Chrome or Edge. Keep the <code>lib</code> folder next to it. If it opens in another program, right-click and choose Open with Microsoft Edge.</p></li>
+      <li><h3>Open a PDF and edit</h3><p>Drop a PDF or photos onto the window, make your changes, then press Save PDF. The edited copy goes to your Downloads folder.</p></li>
+    </ol>
+  </div>
+</section>
+
+<section class="faq" id="faq">
+  <div class="wrap">
+    <h2>Questions</h2>
+    <details><summary>Are my files really never uploaded?</summary><p>Yes. PDF Desk is a set of files on your computer that runs inside your browser. Opening, editing and text recognition all happen on your machine, and the app makes no online requests at all.</p></details>
+    <details><summary>Does it work without internet?</summary><p>Yes. Every feature works fully offline, including reading scanned pages.</p></details>
+    <details><summary>Will edited text look exactly like the original?</summary><p>Very close. PDF Desk matches the size, colour and boldness, and uses a standard Arial, Times or Courier style font. If the original used an unusual font, the new words may look slightly different. Use A− and A+ to fine-tune the size.</p></details>
+    <details><summary>Can it read scanned documents?</summary><p>Yes. “Make searchable” reads English text from scanned pages, typically 5 to 15 seconds per page. After that you can search, copy, edit and convert the text.</p></details>
+    <details><summary>Is white-out the same as redaction?</summary><p>No. White-out and Edit text cover the old words, but they can still be copied out of the file. Redact permanently removes the content from the page when you save. Use Redact for anything confidential.</p></details>
+    <details><summary>Which computers does it support?</summary><p>Windows 10 or 11 with Google Chrome or Microsoft Edge. It also runs on Mac and Linux in Chrome, though it is designed and tested for Windows.</p></details>
+    <details><summary>Is it really free? What is the catch?</summary><p>It is free, with no paid version, no ads and no data collection. It is built on free open-source libraries, credited at the bottom of this page.</p></details>
+    <details><summary>Can it convert PDF to Word or Excel?</summary><p>No. PDF Desk focuses on editing, signing and forms. To get the text out of a PDF, open it in PDF Desk, run “Make searchable” if it is a scan, then copy the text.</p></details>
+  </div>
+</section>
+</main>
+
+<footer>
+  <div class="wrap">
+    <div>
+      <h3>PDF Desk</h3>
+      <p>Free offline PDF editor for Windows. Questions or suggestions: <a href="mailto:pdfdesk@nexoralogics.com">you@example.com</a>.</p>
+      <p>Source and releases on <a href="https://github.com/YOUR-USERNAME/pdf-desk">GitHub</a>.</p>
+    </div>
+    <div>
+      <h3>Built with open source</h3>
+      <p><a href="https://github.com/mozilla/pdf.js">PDF.js</a> (Apache 2.0), <a href="https://github.com/Hopding/pdf-lib">pdf-lib</a> (MIT), <a href="https://github.com/naptha/tesseract.js">Tesseract.js</a> (Apache 2.0) and <a href="https://github.com/naptha/tesseract.js-core">Tesseract</a> trained data (Apache 2.0). Site set in <a href="https://github.com/jpt/barlow">Barlow</a> (SIL Open Font License). Thank you to their authors.</p>
+    </div>
+  </div>
+</footer>
+</body>
+</html>
